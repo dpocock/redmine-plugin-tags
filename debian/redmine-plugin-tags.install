@@ -1,0 +1,8 @@
+app             /usr/share/redmine/plugins/redmineup_tags
+assets          /usr/share/redmine/plugins/redmineup_tags
+config          /usr/share/redmine/plugins/redmineup_tags
+db              /usr/share/redmine/plugins/redmineup_tags
+lib             /usr/share/redmine/plugins/redmineup_tags
+test            /usr/share/redmine/plugins/redmineup_tags
+Gemfile         /usr/share/redmine/plugins/redmineup_tags
+init.rb         /usr/share/redmine/plugins/redmineup_tags

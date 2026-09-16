@@ -1,0 +1,157 @@
+
+General notes about installing plugins on Debian
+------------------------------------------------
+
+  After installing new plugins, it is necessary to run the Rake command
+to update Redmine database schemas on each instance of Redmine where
+you use the plugin.
+
+  Debian's Redmine packaging supports multiple instances of Redmine on the
+same host.  These are the exact steps:
+
+1) Install the plugin with apt
+
+2) Create a symlink for each ${INSTANCE} from
+
+      /var/lib/redmine/${INSTANCE}/plugins/
+
+          pointing to /usr/share/redmine/plugins/${THIS_PLUGIN}
+
+   Example command:
+
+      ln -s /usr/share/redmine/plugins/${THIS_PLUGIN} \
+         /var/lib/redmine/${INSTANCE}/plugins/
+
+3) Ensure all per-instance directories have been created correctly
+   under /var/lib/redmine/${INSTANCE}/
+
+   Using the Debian script to create instances should do everything
+   correctly.  For example:
+
+      /usr/share/redmine/bin/redmine-instances create test01
+
+4) Ensure all per-instance directories have the correct owner and
+   permissions.  Some directories, such as the cache directory for
+   each instance, must be writeable by the user running the Redmine
+   process.
+   
+   On Apache2 / Passenger-based installations, the www-data
+   user must be able to write to the cache directory
+
+   There appears to be some confusion about which directory should be used.
+   The exact directory names have varied in different versions of the
+   Debian Redmine multi-tenancy packaging scheme.
+
+   Older versions of Redmine used an Alias or similar directive
+   in the web server VirtualHost configuration to map /assets/ or
+   /plugin_assets/ into the web site.  Please check carefully whether
+   these Alias directives are correct or whether they should be
+   removed from the web server configuration completely depending
+   on the Redmine version.
+
+   An example command to ensure permissions are correct:
+
+     chown -R www-data:www-data \
+          /var/cache/redmine/${INSTANCE}/assets                \
+          /var/cache/redmine/${INSTANCE}/assets/plugin_assets  \
+          /var/cache/redmine/${INSTANCE}/plugin_assets
+
+5) Run the Rake command with the name of the Instance, e.g.
+
+      sudo -u www-data \
+          RAILS_ENV=production \
+          REDMINE_INSTANCE=${INSTANCE} \
+          SCHEMA=/dev/null \
+              rake redmine:plugins
+
+6) Run the Rake command for plugin_assets:
+
+      sudo -u www-data \
+          RAILS_ENV=production \
+          REDMINE_INSTANCE=${INSTANCE} \
+          SCHEMA=/dev/null \
+              rake assets:precompile
+
+6) After doing the above steps for every Redmine instance where you
+   symlinked the plugin, restart the process where Redmine is hosted.
+   For example, restart Apache with
+
+       systemctl restart apache2
+
+7) Look at the Administration / Plugins list to verify the plugin
+   was detected by Redmine.
+
+8) Check /var/log/redmine/${INSTANCE}/production.log, the web server logs,
+   SQL database logs and system logs / journalctl for any errors
+   when you first start using the plugin.
+
+   Please report any errors in both the Redmine Forum and the
+   Debian Bug Tracking System (BTS).  For example, to report
+   a bug to Debian:
+
+         To: submit@bugs.debian.org
+         Subject: Redmine missing task_done.png
+
+         Message body:
+
+             Package: redmine
+             Version: 6.0.5+ds-1
+
+             I was looking at Redmine production.log and I saw errors
+             about a missing file task_done.png 
+
+
+Troubleshooting plugins on Debian
+---------------------------------
+
+  Make sure you have the latest version of the package from either
+debian.org or debify.org
+
+  Look at the JavaScript console in the web browser.
+
+  Look in the developer console of the web browser, network tab,
+to see if it is failing to retrieve any files.
+
+  Look at the /var/log/redmine/${INSTANCE}/production.log
+
+  Look for error responses (e.g. 404) in the web server access.log
+
+  Look for any errors in the web server error.log file
+
+  Look in the cache directories for each Redmine instance and verify the 
+JavaScript and CSS stylesheets were correctly copied from the plugin.
+There appears to be some confusion about which directory should be used.
+The exact directory names have varied in different versions of the
+Debian Redmine multi-tenancy packaging scheme.
+Look in each of these locations to verify the directory ownership,
+write permissions and presence of the files for the installed plugins.
+
+      ls /var/cache/redmine/${INSTANCE}/plugin_assets
+      ls /var/cache/redmine/${INSTANCE}/assets
+      ls /var/cache/redmine/${INSTANCE}/assets/plugin_assets
+
+  Review the web server configuration to see if there are any Alias
+directives or similar commands that impact the location of plugin-related
+files.  Some of these directives were created for older versions of
+Redmine and they may need to be revised or removed for the currently
+installed version.
+
+  Try using Rake task assets:reveal to study the list of
+files installed by plugins.
+
+  Try re-running Rake tasks assets:precompile and redmine:plugins:migrate
+to ensure plugin assets (files) and schema are correctly installed.
+
+  Use strace to see where Ruby is looking for the plugin_assets
+
+  Ask questions in the Redmine forum:
+
+    https://www.redmine.org/projects/redmine/boards
+
+Daniel Pocock,
+Debian Developer
+https://danielpocock.com
+
+Software Freedom Institute
+https://softwarefreedom.institute
+
