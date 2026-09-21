@@ -58,7 +58,7 @@ same host.  These are the exact steps:
 
 5) Run the Rake command with the name of the Instance, e.g.
 
-      sudo -u www-data \
+      cd /usr/share/redmine && sudo -u www-data \
           RAILS_ENV=production \
           REDMINE_INSTANCE=${INSTANCE} \
           SCHEMA=/dev/null \
@@ -66,7 +66,7 @@ same host.  These are the exact steps:
 
 6) Run the Rake command for plugin_assets:
 
-      sudo -u www-data \
+      cd /usr/share/redmine && sudo -u www-data \
           RAILS_ENV=production \
           REDMINE_INSTANCE=${INSTANCE} \
           SCHEMA=/dev/null \
