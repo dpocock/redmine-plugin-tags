@@ -72,22 +72,29 @@ same host.  These are the exact steps:
           SCHEMA=/dev/null \
               rake assets:precompile
 
-6) After doing the above steps for every Redmine instance where you
+7) Re-run the Debian package maintainer script:
+
+      sudo dpkg-reconfigure redmine
+
+8) After doing the above steps for every Redmine instance where you
    symlinked the plugin, restart the process where Redmine is hosted.
    For example, restart Apache with
 
        systemctl restart apache2
 
-7) Look at the Administration / Plugins list to verify the plugin
+9) Look at the Administration / Plugins list to verify the plugin
    was detected by Redmine.
 
-8) Check /var/log/redmine/${INSTANCE}/production.log, the web server logs,
+10) Check /var/log/redmine/${INSTANCE}/production.log, the web server logs,
    SQL database logs and system logs / journalctl for any errors
    when you first start using the plugin.
 
-   Please report any errors in both the Redmine Forum and the
-   Debian Bug Tracking System (BTS).  For example, to report
-   a bug to Debian:
+Reporting errors
+----------------
+
+Please report any errors in both the Redmine Forum and the
+Debian Bug Tracking System (BTS).  For example, to report
+a bug to Debian:
 
          To: submit@bugs.debian.org
          Subject: Redmine missing task_done.png
@@ -129,6 +136,10 @@ write permissions and presence of the files for the installed plugins.
       ls /var/cache/redmine/${INSTANCE}/plugin_assets
       ls /var/cache/redmine/${INSTANCE}/assets
       ls /var/cache/redmine/${INSTANCE}/assets/plugin_assets
+
+  Read the instructions in /usr/share/doc/redmine/README.Debian.gz
+In particular, look for current instructions about plugins and
+the plugin_assets directory.
 
   Review the web server configuration to see if there are any Alias
 directives or similar commands that impact the location of plugin-related
