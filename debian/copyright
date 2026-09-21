@@ -3,7 +3,7 @@ Upstream-Name: redmine-plugin-tags
 Source: https://www.redmine.org/plugins/redmineup_tags
 
 Files: *
-Copyright: 2017, Kirill Bezrukov
+Copyright: 2017, Kirill Bezrukov <support@redmineup.com>
 License: GPL-2
 
 Files: debian/*
